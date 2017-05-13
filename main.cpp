@@ -1,6 +1,5 @@
 #include <iostream>
 #include <string>
-#include <sstream>
 
 using namespace std;
 
@@ -23,6 +22,9 @@ int main() {
    output += c;
   }
  }
- cout << "Sum of digits i your data more than 100. Input stoped." << endl << output << endl;
+ cout << "Sum of digits in your data more than 100. Input stoped." << endl;
+ cout << "The handled output is:" << endl;
+ cout << output << endl;
+ cout << "The handled output printed." << endl;
  return 0;
 }
