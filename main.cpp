@@ -2,26 +2,30 @@
 #include <string>
 #include <locale>
 #include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
 class InputStopChecker {
  public:
-  virtual bool checkStopCondition() {return true;};
-  virtual void addCharacter(char & c) {};
+  virtual bool checkStopCondition() = 0;
+  virtual void addCharacter(char & c) = 0;
 };
 
 class InputHandler {
  public:
-  virtual void addCharacter(char & c) {};
-  virtual string getOutput() { return "";};
+  virtual void addCharacter(char & c) = 0;
+  virtual string getOutput() = 0;
 };
 
 class InputStopChecker22: public InputStopChecker {
  private:
   locale loc;
-  int numeral_sum = 0;
+  int numeral_sum;
  public:
+  InputStopChecker22() {
+   numeral_sum = 0;
+  }
   bool checkStopCondition() {
    if (numeral_sum > 100) {
     return true;
@@ -39,9 +43,13 @@ class InputStopChecker22: public InputStopChecker {
 
 class InputHandler23: public InputHandler {
  private:
-  int simbol_counter = 0;
-  string output = "";
+  int simbol_counter;
+  string output;
  public:
+  InputHandler23() {
+   simbol_counter = 0;
+   output = "";
+  }
   void addCharacter(char & c) {
    if (simbol_counter < 100) {
     output += c;
