@@ -6,19 +6,7 @@
 
 using namespace std;
 
-class InputStopChecker {
- public:
-  virtual bool checkStopCondition() = 0;
-  virtual void addCharacter(char & c) = 0;
-};
-
-class InputHandler {
- public:
-  virtual void addCharacter(char & c) = 0;
-  virtual string getOutput() = 0;
-};
-
-class InputStopChecker22: public InputStopChecker {
+class InputStopChecker22 {
  private:
   locale loc;
   int numeral_sum;
@@ -33,15 +21,17 @@ class InputStopChecker22: public InputStopChecker {
     return false;
    }
   }
-  void addCharacter(char & character) {
-   if (isdigit(character, loc)) {
-    int digit = atoi(&character);
-    numeral_sum = numeral_sum + digit;
+  void handleLine(string & line) {
+   for (int i = 0; i < line.size(); i++) {
+    if ('0' <= line[i] && line[i] <= '9') {
+     int digit = line[i] - '0';
+     numeral_sum += digit;
+    }
    }
   }
 };
 
-class InputHandler23: public InputHandler {
+class InputHandler23 {
  private:
   int simbol_counter;
   string output;
@@ -50,36 +40,67 @@ class InputHandler23: public InputHandler {
    simbol_counter = 0;
    output = "";
   }
-  void addCharacter(char & c) {
+  void handleLine(string & line) {
    if (simbol_counter < 100) {
-    output += c;
-    if (!isspace(c)) {
-     simbol_counter++;
+    for (int i = 0; i < line.size(); i++) {
+     if (simbol_counter < 100) {
+      if (line[i] != ' ' && line[i] != '\n' && line[i] != '\t') {
+       simbol_counter++;
+      }
+      output += line[i];
+     } else {
+      break;
+     }
     }
+    output += '\n';
    }
   }
   string getOutput() { return output; }
 };
 
-void handleInput(istream & istream, ostream & ostream, InputStopChecker* checker, InputHandler* handler) {
- char c;
- while (!checker->checkStopCondition()) {
-  istream >> c;
-  checker->addCharacter(c);
-  handler->addCharacter(c);
+class ConsoleOutputHandler {
+ public:
+  void handleOutput(string & output) {
+   cout << output;
+  }
+};
+
+void handleInput(istream & istream, ostream & ostream, InputStopChecker22* checker, InputHandler23* handler, ConsoleOutputHandler* output) {
+ cout << "===Please enter no more than 25 string with length no more than 100." << endl;
+ bool stopped = false;
+ int line_counter = 0;
+ while (!stopped) {
+  string line;
+  getline(istream, line);
+  if (line.length() > 100) {
+   ostream << "===Your line have length more than 100 character it will be resised to maximal length 100." << endl;
+   line.resize(100);
+  }
+  handler->handleLine(line);
+  checker->handleLine(line);
+  line_counter++;
+  if (checker->checkStopCondition()) {
+   ostream << "===Sum of numbers in your input more than 100 input stopped." << endl;
+   stopped = true;
+  }
+  if (!stopped && line_counter == 25) {
+   ostream << "===You entered 25 strings. Input stopped." << endl;
+   stopped = true;
+  }
  }
- ostream << handler->getOutput();
+ ostream << "===Start output." << endl;
+ string out = handler->getOutput();
+ output->handleOutput(out);
+ ostream << "===Output finished." << endl;
 }
 
 int main() {
 
- InputStopChecker22 checker1;
- InputHandler23 handler1;
+ InputStopChecker22 checker;
+ InputHandler23 handler;
+ ConsoleOutputHandler output;
 
- InputStopChecker * checker = &checker1;
- InputHandler * handler = &handler1;
-
- handleInput(cin, cout, checker, handler);
+ handleInput(cin, cout, &checker, &handler, &output);
 
  return 0;
 }
